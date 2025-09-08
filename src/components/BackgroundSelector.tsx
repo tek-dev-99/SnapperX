@@ -30,11 +30,10 @@ export const BackgroundSelector: React.FC<BackgroundSelectorProps> = ({
           <div key={bg.name} className="text-center">
             <button
               onClick={() => onBackgroundChange(bg.gradient)}
-              className={`w-12 h-12 rounded-lg border-2 transition-all ${
-                selectedBackground === bg.gradient 
-                  ? 'border-blue-500 scale-105' 
+              className={`w-12 h-12 rounded-lg border-2 transition-all ${selectedBackground === bg.gradient
+                  ? 'border-blue-500 scale-105'
                   : 'border-gray-200 hover:border-gray-300'
-              }`}
+                }`}
               style={{ background: bg.gradient }}
             />
             <p className="text-xs text-gray-600 mt-1">{bg.name}</p>

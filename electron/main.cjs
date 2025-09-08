@@ -43,10 +43,10 @@ function saveScreenshotToAppData(originalPath) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileName = `screenshot_${timestamp}.png`;
     const destinationPath = path.join(appDataPath, fileName);
-    
+
     // Copy the screenshot to app data directory
     fs.copyFileSync(originalPath, destinationPath);
-    
+
     // Add to recent screenshots list
     const screenshotInfo = {
       id: timestamp,
@@ -54,9 +54,9 @@ function saveScreenshotToAppData(originalPath) {
       originalPath: originalPath,
       timestamp: new Date().toISOString()
     };
-    
+
     recentScreenshots.unshift(screenshotInfo);
-    
+
     // Keep only the last MAX_RECENT_SCREENSHOTS
     if (recentScreenshots.length > MAX_RECENT_SCREENSHOTS) {
       const removed = recentScreenshots.pop();
@@ -65,10 +65,10 @@ function saveScreenshotToAppData(originalPath) {
         fs.unlinkSync(removed.path);
       }
     }
-    
+
     // Save recent screenshots list to file
     saveRecentScreenshotsList();
-    
+
     return screenshotInfo;
   } catch (error) {
     console.error('Error saving screenshot to app data:', error);
@@ -91,7 +91,7 @@ function loadRecentScreenshotsList() {
     if (fs.existsSync(listPath)) {
       const data = fs.readFileSync(listPath, 'utf8');
       recentScreenshots = JSON.parse(data);
-      
+
       // Verify files still exist and clean up if not
       recentScreenshots = recentScreenshots.filter(screenshot => {
         if (fs.existsSync(screenshot.path)) {
@@ -101,7 +101,7 @@ function loadRecentScreenshotsList() {
           return false;
         }
       });
-      
+
       saveRecentScreenshotsList();
     }
   } catch (error) {
@@ -132,10 +132,10 @@ function createWindow() {
 function openEditorWithImage(imagePath) {
   fs.readFile(imagePath, (err, data) => {
     if (err) return;
-    
+
     // Save screenshot to app data
     const savedScreenshot = saveScreenshotToAppData(imagePath);
-    
+
     if (!mainWindow) {
       createWindow();
       mainWindow.once('ready-to-show', () => {
@@ -189,17 +189,17 @@ function triggerScreenshotTool() {
 
 function checkLinuxShortcutConflicts() {
   console.log('=== LINUX SHORTCUT CONFLICT CHECK ===');
-  
+
   // Common Linux desktop environment shortcuts that might conflict
   const commonShortcuts = [
     'Control+Shift+4',
-    'Control+Shift+5', 
+    'Control+Shift+5',
     'Control+Alt+S',
     'Control+Shift+S',
     'Control+Alt+4',
     'Control+Alt+5'
   ];
-  
+
   console.log('Checking for conflicts with common shortcuts:');
   commonShortcuts.forEach(shortcut => {
     if (globalShortcut.isRegistered(shortcut)) {
@@ -208,19 +208,19 @@ function checkLinuxShortcutConflicts() {
       console.log(`✅ ${shortcut} is available`);
     }
   });
-  
+
   // Check desktop environment
   const desktop = process.env.XDG_CURRENT_DESKTOP || process.env.DESKTOP_SESSION || 'unknown';
   console.log('Desktop environment:', desktop);
-  
+
   // Check if running under Wayland or X11
   const displayServer = process.env.WAYLAND_DISPLAY ? 'Wayland' : 'X11';
   console.log('Display server:', displayServer);
-  
+
   // Check for common screenshot tools
   const { execSync } = require('child_process');
   const screenshotTools = ['gnome-screenshot', 'spectacle', 'xfce4-screenshooter', 'flameshot'];
-  
+
   console.log('Available screenshot tools:');
   screenshotTools.forEach(tool => {
     try {
@@ -235,7 +235,7 @@ function checkLinuxShortcutConflicts() {
 app.whenReady().then(() => {
   const screenshotFolder = getScreenshotFolder();
   watchForScreenshots(screenshotFolder);
-  
+
   // Load recent screenshots on app start
   loadRecentScreenshotsList();
 
@@ -243,12 +243,12 @@ app.whenReady().then(() => {
   console.log('Platform:', process.platform);
   console.log('Node version:', process.version);
   console.log('Electron version:', process.versions.electron);
-  
+
   // Check for Linux-specific conflicts
   if (process.platform === 'linux') {
     checkLinuxShortcutConflicts();
   }
-  
+
   // Try different shortcuts if the default one fails
   const shortcuts = [
     'Control+Shift+4',        // Linux specific
@@ -257,20 +257,20 @@ app.whenReady().then(() => {
     'Control+Alt+S',          // Another alternative
     'Control+Shift+S',        // Another alternative
   ];
-  
+
   let shortcutRegistered = false;
-  
+
   for (const shortcut of shortcuts) {
     console.log(`Attempting to register: ${shortcut}`);
     const success = globalShortcut.register(shortcut, () => {
       console.log(`✅ Screenshot shortcut triggered: ${shortcut}`);
       triggerScreenshotTool();
     });
-    
+
     if (success) {
       console.log(`✅ Successfully registered shortcut: ${shortcut}`);
       shortcutRegistered = true;
-      
+
       // Send the registered shortcut to renderer
       if (mainWindow) {
         mainWindow.webContents.send('shortcut-registered', shortcut);
@@ -278,14 +278,14 @@ app.whenReady().then(() => {
       break;
     } else {
       console.log(`❌ Failed to register shortcut: ${shortcut}`);
-      
+
       // Check if shortcut is already registered by another app
       if (globalShortcut.isRegistered(shortcut)) {
         console.log(`⚠️  Shortcut ${shortcut} is already registered by another application`);
       }
     }
   }
-  
+
   if (!shortcutRegistered) {
     console.error('❌ No screenshot shortcuts could be registered!');
     console.error('This might be due to:');
@@ -322,16 +322,16 @@ ipcMain.handle('delete-screenshot', async (event, screenshotId) => {
     const screenshotIndex = recentScreenshots.findIndex(s => s.id === screenshotId);
     if (screenshotIndex !== -1) {
       const screenshot = recentScreenshots[screenshotIndex];
-      
+
       // Delete the file
       if (fs.existsSync(screenshot.path)) {
         fs.unlinkSync(screenshot.path);
       }
-      
+
       // Remove from list
       recentScreenshots.splice(screenshotIndex, 1);
       saveRecentScreenshotsList();
-      
+
       return true;
     }
     return false;

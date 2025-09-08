@@ -37,18 +37,17 @@ export const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({
             <button
               key={ratio.value}
               onClick={() => onRatioChange(ratio.value)}
-              className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                selectedRatio === ratio.value
+              className={`px-3 py-1 text-sm rounded-md transition-colors ${selectedRatio === ratio.value
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+                }`}
             >
               {ratio.name}
             </button>
           ))}
         </div>
       </div>
-      
+
       <div>
         <label className="text-sm font-medium text-gray-700 mb-2 block">Social Media</label>
         <div className="grid grid-cols-4 gap-2">
