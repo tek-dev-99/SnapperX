@@ -1,4 +1,4 @@
-# SnapperX (Desktop Screenshot App)
+# SnapperX (Desktop Screenshot App using Electron + React) 
 
 SnapperX is a lightweight desktop app (similar to Xnapper) that makes taking and editing screenshots effortless.
 
