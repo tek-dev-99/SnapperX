@@ -1,4 +1,4 @@
-## 🎥 Demo
+
 ![Demo](assets/demo.gif)
 
 # SnapperX (Desktop Screenshot App using Electron + React) 
